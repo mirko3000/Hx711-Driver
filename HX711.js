@@ -153,9 +153,48 @@ class HX711 {
     return sum / numberOfTimes;
   }
 
+  readMedian(numberOfTimes) {
+    this.latestReading = this.__applyNormalisation(
+      this.__readRawMedian(numberOfTimes)
+    );
+    return this.latestReading;
+  }
+
+  /**
+   *
+   * @param numberOfTimes
+   * @returns {number}
+   */
+  __readRawMedian(numberOfTimes) {
+    numberOfTimes = numberOfTimes < 0 ? 1 : numberOfTimes;
+    let sum = 0;
+    let values = [];
+    for (let i = 0; i < numberOfTimes; i++) {
+      let result = false;
+      while (result === false) {
+        result = this.__readRaw();
+      }
+      values.push(result);
+    }
+    return __getMedian(values);
+  }
+
+  /**
+   *
+   * @param values
+   * @returns {number}
+   */
+   __getMedian(values) {
+     const mid = Math.floor(values.length / 2),
+       nums = [...values].sort((a, b) => a - b);
+     return values.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+   };
+
+
   read() {
     return this.readAverage(1);
   }
+
 
   /**
    *
